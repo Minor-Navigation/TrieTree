@@ -5,27 +5,43 @@ using namespace std;
 #define ll long long
 #define node_size 256
 
-
-fstream file;
+fstream file,file_link;
 
 vector <string> prefix;
 
-class node{
+class node_link{
 public:
-	ll ptr[256];
-	ll nodePtr;
+
     char longitude[25], latitude[25];
     char id[15];
-    node()
-	{
-		for(int i=0;i<256;i++)
-			ptr[i]=-1;
-            nodePtr=-1;
+    char admin_level[3];
+    ll next;
+
+    node_link()
+    {
+        next=-1;
     }
+
 };
 
+class node{
+public :
+    ll ptr[256];
+    ll nodePtr,nodePtr_end;
+
+    node()
+    {
+        for(int i=0;i<256;i++)
+            {ptr[i]=-1;}
+            nodePtr=-1;
+            nodePtr_end=-1;
+    }
+
+
+};
 
 void display_prefix(string s,int ind,ll curr_root){
+
     if( ind>0 ){
         ll curr_child=0;
         for(int i=0;i<s.length();i++){
@@ -45,12 +61,26 @@ void display_prefix(string s,int ind,ll curr_root){
         }
 
     }
+
     file.seekp(curr_root);file.seekg(curr_root);
     node root;
     file.read((char*)&root,sizeof(node));
 
-    if(root.nodePtr==1){
-        prefix.push_back(s);
+    if(root.nodePtr!=-1){
+       // prefix.push_back(s);
+        file_link.seekp(root.nodePtr);file_link.seekg(root.nodePtr);
+
+        node_link link_list;
+
+        while(1){
+            file_link.read((char*)&link_list,sizeof(node_link));
+
+            prefix.push_back(s);
+            if(link_list.next==-1){break;}
+            file_link.seekp(link_list.next);file_link.seekg(link_list.next);
+
+        }
+
     }
 
     for(int i=0;i<node_size;i++){
@@ -92,37 +122,34 @@ node search_trie(string s){
         }
 
         curr_root=curr_child;
-   
+
     }
 }
 
 int main(){
 	long long curr_child=0,curr_root=0,m=0;
     file.open("trie.txt",ios::app|ios::in|ios::out);
+    file_link.open("trie_link.txt",ios::app|ios::in|ios::out);
 
     curr_root=0;
     file.seekp(0,ios::end);
     curr_child=file.tellp();
     file.seekp(curr_root);file.seekg(curr_root);
 
-   
+
 
     // search
     cout<<endl<<endl;
-    node x= search_trie("sikandarabad");
-    
-    cout<<x.nodePtr<<endl;
+    node x= search_trie("abc");
 
-    cout<<x.id<<endl;
-    cout<<x.latitude<<endl;
-    cout<<x.longitude<<endl;
+    cout<<x.nodePtr_end<<endl;
 
-    string temp="new"; //prefix search
+    string temp="abc"; //prefix search
     display_prefix(temp,temp.length(),0);
     for(int i=0;i<prefix.size();i++){
         cout<<prefix[i]<<" "<<endl;
     }
     file.close();
-    
+
 	return 0;
 }
