@@ -15,7 +15,7 @@ public:
     ll next;
 
     node_link()
-	{
+    {
         next=-1;
     }
 
@@ -23,13 +23,13 @@ public:
 
 class node{
 public :
-	ll ptr[256];
-	ll nodePtr,nodePtr_end;
+    ll ptr[256];
+    ll nodePtr,nodePtr_end;
 
     node()
-	{
-		for(int i=0;i<256;i++)
-			{ptr[i]=-1;}
+    {
+        for(int i=0;i<256;i++)
+            {ptr[i]=-1;}
             nodePtr=-1;
             nodePtr_end=-1;
     }
@@ -41,18 +41,18 @@ fstream file,file_link;
 
 
 void link_last_node(node& child,string name, string id, string longi, string lati, string lev){
-	ll curr_link=0,curr_end=0;
-			cout<<child.nodePtr<<" ";
+    ll curr_link=0,curr_end=0;
+           // cout<<child.nodePtr<<" ";
 
-	if(child.nodePtr==-1){
-		file_link.seekp(0,ios::end);file_link.seekg(0,ios::end);
-		child.nodePtr=file_link.tellp();
-		child.nodePtr_end=file_link.tellp();
+    if(child.nodePtr==-1){
+        file_link.seekp(0,ios::end);file_link.seekg(0,ios::end);
+        child.nodePtr=file_link.tellp();
+        child.nodePtr_end=file_link.tellp();
 
-		cout<<child.nodePtr_end<<endl;
-		node_link last;
+        cout<<child.nodePtr_end<<endl;
+        node_link last;
 
-    	(id).copy(last.id, id.length());
+        (id).copy(last.id, id.length());
         last.id[id.length()]='\0';
 
         (longi).copy(last.longitude, longi.length());
@@ -64,21 +64,21 @@ void link_last_node(node& child,string name, string id, string longi, string lat
         (lev).copy(last.admin_level, lev.length());
         last.admin_level[lev.length()]='\0';
 
-		file_link.write((char*)&last,sizeof(node_link));
-	}
-	else{
-		file_link.seekp(0,ios::end);file_link.seekg(0,ios::end);
-		curr_link=child.nodePtr_end;
+        file_link.write((char*)&last,sizeof(node_link));
+    }
+    else{
+        file_link.seekp(0,ios::end);file_link.seekg(0,ios::end);
+        curr_link=child.nodePtr_end;
 
-		child.nodePtr_end=file_link.tellp();
-		cout<<child.nodePtr_end<<endl;
+        child.nodePtr_end=file_link.tellp();
+        //cout<<child.nodePtr_end<<endl;
 
-		curr_end=file_link.tellp();
+        curr_end=file_link.tellp();
 
-		node_link last;
-        cout<<"  "<<last.next;
+        node_link last;
+        //cout<<"  "<<last.next;
 
-    	(id).copy(last.id, id.length() );
+        (id).copy(last.id, id.length() );
         last.id[id.length()]='\0';
 
         (longi).copy(last.longitude, longi.length());
@@ -90,24 +90,24 @@ void link_last_node(node& child,string name, string id, string longi, string lat
         (lev).copy(last.admin_level, lev.length());
         last.admin_level[lev.length()]='\0';
 
-		file_link.write((char*)&last,sizeof(node_link));
+        file_link.write((char*)&last,sizeof(node_link));
 
-		//linking list end pointer to new pointer
-		file_link.seekp(curr_link);file_link.seekg(curr_link);
+        //linking list end pointer to new pointer
+        file_link.seekp(curr_link);file_link.seekg(curr_link);
 
-		file_link.read((char*)&last,sizeof(node_link));
-		last.next=curr_end;
-		file_link.seekp(curr_link);file_link.seekg(curr_link);
+        file_link.read((char*)&last,sizeof(node_link));
+        last.next=curr_end;
+        file_link.seekp(curr_link);file_link.seekg(curr_link);
 
-		file_link.write((char*)&last,sizeof(node_link));
+        file_link.write((char*)&last,sizeof(node_link));
 
-	}
+    }
 
 }
-
+ll c=0;
 void trie(string name, string id, string longi, string lati, string lev){
          ll curr_child=0, curr_root=0;
-
+         c++;
         for(int i=0;i<name.length();i++){
             file.seekp(curr_root);file.seekg(curr_root);
             node root;
@@ -119,7 +119,7 @@ void trie(string name, string id, string longi, string lati, string lev){
 
                 if(i==name.length()-1){
 
-                	link_last_node(child, name, id, longi, lati,lev);
+                    link_last_node(child, name, id, longi, lati,lev);
 
                 }
 
@@ -140,7 +140,7 @@ void trie(string name, string id, string longi, string lati, string lev){
 
                 if(i==name.length()-1){
 
-                	link_last_node(child, name, id, longi, lati,lev);
+                    link_last_node(child, name, id, longi, lati,lev);
 
                 }
 
@@ -149,7 +149,7 @@ void trie(string name, string id, string longi, string lati, string lev){
             }
 
             curr_root=curr_child;
-            cout<<curr_root<<endl;
+            //cout<<curr_root<<endl;
 
         }
 
@@ -157,7 +157,7 @@ void trie(string name, string id, string longi, string lati, string lev){
 
 string delimiter;
 string longitude, latitude;
-string id, name;
+string id, name,level;
 
 void read_file(string str){
         string::size_type sz = 0;
@@ -176,9 +176,13 @@ void read_file(string str){
             }
             else if(ii==2){
                 ii++;
-                longitude= token;
+                level = token;
             }
             else if(ii==3){
+                ii++;
+                longitude= token;
+            }
+            else if(ii==4){
                 ii++;
                 latitude = token;
             }
@@ -190,39 +194,40 @@ void read_file(string str){
 int main(){
 
     ll curr_child=0,curr_root=0,m=0;
-	string filename="trie.txt";
-	file.open("trie.txt",ios::trunc|ios::in|ios::out);
-	file_link.open("trie_link.txt",ios::trunc|ios::in|ios::out);
+    string filename="trie.txt";
+    file.open("trie.txt",ios::trunc|ios::in|ios::out);
+    file_link.open("trie_link.txt",ios::trunc|ios::in|ios::out);
 
-	node root;
-	file.seekp(0);file.seekg(0);
+    node root;
+    file.seekp(0);file.seekg(0);
     file.write((char*)&root,sizeof(node));
-/*
+
 //abcd 1 2.2 3.3 2
-    std::ifstream node_file("node_data1.txt");
+    std::ifstream node_file("NodeDataForTrie.txt");
     delimiter = "$";
     string str;
     while(!node_file.eof()) // To get you all the lines.
     {
         getline(node_file,str); // Saves the line in STRING.
         read_file(str);
-        trie(name, id, longitude, latitude);
-    }
+        trie(name, id,level, longitude, latitude);
 
-*/
+    }
+    cout<<endl<<c<<endl;
+/*
 ll t;
 cin>>t;
 string a1,a2,a3,a4,a5;
     while(t--){
 
-    	cin>>a1>>a2>>a3>>a4>>a5;
-    	trie(a1,a2,a3,a4,a5);
+        cin>>a1>>a2>>a3>>a4>>a5;
+        trie(a1,a2,a3,a4,a5);
 
     }
-
+*/
 //    node_file.close();
     file_link.close();
     file.close();
 
-	return 0;
+    return 0;
 }
