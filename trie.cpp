@@ -66,9 +66,9 @@ c++;
         (lev).copy(last.admin_level, lev.length());
         last.admin_level[lev.length()]='\0';
         last.next=-1;
-
+        cout<<last.longitude<<"    "<<last.latitude<<endl;
         file_link.write((char*)&last,sizeof(node_link));
-    cout<<last.next<<" :next -1:"<<file_link.tellp()<<endl;
+  //  cout<<last.next<<" :next -1:"<<file_link.tellp()<<endl;
 
     }
     else{
@@ -99,14 +99,14 @@ c++;
 
         //linking list end pointer to new pointer
         file_link.seekp(curr_link);file_link.seekg(curr_link);
-    cout<<last.next<<" up:next "<<file_link.tellp()<<endl;
+   // cout<<last.next<<" up:next "<<file_link.tellp()<<endl;
 
         file_link.read((char*)&last,sizeof(node_link));
 
         //cout<<"      "<<last.next<<endl;
         file_link.seekp(curr_link);file_link.seekg(curr_link);
         last.next=curr_end;
-    cout<<last.next<<" :next "<<file_link.tellp()<<endl;
+   // cout<<last.next<<" :next "<<file_link.tellp()<<endl;
 
         file_link.write((char*)&last,sizeof(node_link));
 
@@ -124,7 +124,7 @@ void trie(string name, string id, string longi, string lati, string lev){
             node root;
             file.read((char*)&root,sizeof(node));
             
-            cout<<" if  "<<root.ptr[name[i]-0]<<endl;
+           // cout<<" if  "<<root.ptr[name[i]-0]<<endl;
 
             if(root.ptr[name[i]-0]==-1 ){
                 file.seekp(0,ios::end);file.seekg(0,ios::end);
@@ -149,7 +149,7 @@ void trie(string name, string id, string longi, string lati, string lev){
 
                 node child;
                 curr_child=root.ptr[name[i]-0];
-            cout<<"  else "<<root.ptr[name[i]-0]<<endl;
+          //  cout<<"  else "<<root.ptr[name[i]-0]<<endl;
 
                 file.seekp(curr_child);file.seekg(curr_child);
                 file.read((char*)&child,sizeof(node));
@@ -165,7 +165,7 @@ void trie(string name, string id, string longi, string lati, string lev){
             }
 
             curr_root=curr_child;
-            cout<<curr_root<<endl;
+          //  cout<<curr_root<<endl;
 
         }
 
@@ -238,7 +238,7 @@ int main(){
         getline(node_file,str); // Saves the line in STRING.
         read_file(str);
         cout<<str<<endl;
-        trie(name, id,level, longitude, latitude);
+        trie(name, id, longitude, latitude,level);
         //cout<<name<<endl;
     }
     cout<<endl<<c<<endl;

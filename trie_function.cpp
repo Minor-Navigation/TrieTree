@@ -192,8 +192,8 @@ int main(){
    
      node_with_nodeid(x.nodePtr);
 
-    for(int i=0;i<id_list.size();i++){
-        cout<<id_list[i]<<"  "<<endl;
+    for(int i=0;i<lat_list.size();i++){
+        cout<<lat_list[i]<<"  "<<endl;
     }
 
     file.close();
