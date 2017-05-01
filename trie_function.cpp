@@ -40,9 +40,11 @@ public :
 
 };
 
+
 void display_prefix(string s,int ind,ll curr_root){
 
     if( ind>0 ){
+        prefix.clear();
         ll curr_child=0;
         for(int i=0;i<s.length();i++){
             file.seekp(curr_root);file.seekg(curr_root);
@@ -57,10 +59,11 @@ void display_prefix(string s,int ind,ll curr_root){
             }
             curr_root=curr_child;
             ind--;
-            //cout<<curr_root<<"  ";
+          //  cout<<i<<":i "<<root.nodePtr<<"  "<<ind<<endl;;
         }
 
     }
+    //cout<<s<<endl;
 
     file.seekp(curr_root);file.seekg(curr_root);
     node root;
@@ -71,12 +74,13 @@ void display_prefix(string s,int ind,ll curr_root){
         file_link.seekp(root.nodePtr);file_link.seekg(root.nodePtr);
 
         node_link link_list;
-
+       // cout<<root.nodePtr<<" "<<root.nodePtr_end<<endl;;
         while(1){
             file_link.read((char*)&link_list,sizeof(node_link));
 
             prefix.push_back(s);
-            if(link_list.next==-1){break;}
+            if( link_list.next==-1 || abs(link_list.next)>30000000){break;}
+           // cout<<link_list.next<<endl;
             file_link.seekp(link_list.next);file_link.seekg(link_list.next);
 
         }
@@ -90,15 +94,15 @@ void display_prefix(string s,int ind,ll curr_root){
         }
         else{
             string si=s;
-            si+=(0+i);
+            si+=(char)(0+i);
             display_prefix(si,0,root.ptr[i] );
         }
 
     }
 
     return;
-
 }
+
 
 node search_trie(string s){
     ll curr_child=0,curr_root=0;
@@ -106,6 +110,7 @@ node search_trie(string s){
         file.seekp(curr_root);file.seekg(curr_root);
         node root;
         file.read((char*)&root,sizeof(node));
+        cout<<root.ptr[s[i]-0]<<endl;
 
         if(root.ptr[s[i]-0]==-1 ){
             node x;
@@ -126,8 +131,42 @@ node search_trie(string s){
     }
 }
 
+
+vector <string> id_list;
+vector <string> long_list;
+vector <string> lat_list;
+
+void node_with_nodeid(ll curr_root){
+    id_list.clear();
+    lat_list.clear();
+    file_link.seekp(curr_root);file_link.seekg(curr_root);
+
+    node_link link_list;
+    //cout<<root.nodePtr<<" "<<root.nodePtr_end<<endl;
+    while(1){
+
+        file_link.read((char*)&link_list,sizeof(node_link));
+        string s(link_list.id);
+        id_list.push_back(s);
+        string lo(link_list.longitude);
+        string la(link_list.latitude);
+        lat_list.push_back(la);
+        lat_list.push_back(lo);
+
+
+        if( link_list.next==-1){break;}
+        cout<<link_list.next<<endl;
+        file_link.seekp(link_list.next);file_link.seekg(link_list.next);
+
+    }
+
+    return ;
+
+}
+
+
 int main(){
-	long long curr_child=0,curr_root=0,m=0;
+    long long curr_child=0,curr_root=0,m=0;
     file.open("trie.txt",ios::app|ios::in|ios::out);
     file_link.open("trie_link.txt",ios::app|ios::in|ios::out);
 
@@ -140,16 +179,24 @@ int main(){
 
     // search
     cout<<endl<<endl;
-    node x= search_trie("abc");
+    node x= search_trie("Modinagar");
 
-    cout<<x.nodePtr_end<<endl;
+    cout<<x.nodePtr<<endl;
 
-    string temp="abc"; //prefix search
+    string temp="Mo"; //prefix search
+
     display_prefix(temp,temp.length(),0);
     for(int i=0;i<prefix.size();i++){
         cout<<prefix[i]<<" "<<endl;
     }
-    file.close();
+   
+     node_with_nodeid(x.nodePtr);
 
-	return 0;
+    for(int i=0;i<id_list.size();i++){
+        cout<<id_list[i]<<"  "<<endl;
+    }
+
+    file.close();
+    file_link.close();
+    return 0;
 }

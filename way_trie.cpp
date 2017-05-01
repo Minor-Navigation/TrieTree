@@ -5,17 +5,19 @@
 #include <string>
 using namespace std;
 #define ll long long
+    int ui=0;
 
 class way_link{
 public:
 
     char id[15];
-
+    char longitude[25], latitude[25];
     ll next;
-
+    int delimiter;
     way_link()
 	{
         next=-1;
+        delimiter=-1;
     }
 
 };
@@ -55,8 +57,18 @@ void link_last_way(way& child,vector <string > v){
             //cout<<child.wayPtr_end<<endl;
             way_link last;
 
-            (v[i]).copy(last.id, v[i].length());
+            (v[i]).copy(last.id, v[i].length() );
             last.id[v[i].length()]='\0';
+            i++;
+            (v[i]).copy(last.longitude, v[i].length() );
+            last.longitude[v[i].length()]='\0';
+            i++;
+            (v[i]).copy(last.latitude, v[i].length() );
+            last.latitude[v[i].length()]='\0';
+
+            if(i==v.size()-1){
+                last.delimiter=1;
+            }
 
             file_link.write((char*)&last,sizeof(way_link));
         }
@@ -74,10 +86,20 @@ void link_last_way(way& child,vector <string > v){
 
             (v[i]).copy(last.id, v[i].length() );
             last.id[v[i].length()]='\0';
+            i++;
+            (v[i]).copy(last.longitude, v[i].length() );
+            last.longitude[v[i].length()]='\0';
+            i++;
+            (v[i]).copy(last.latitude, v[i].length() );
+            last.latitude[v[i].length()]='\0';
+
+            if(i==v.size()-1){
+                last.delimiter=1;
+            }
 
             file_link.write((char*)&last,sizeof(way_link));
 
-            //linking list end pointer to new pointer
+            //linking list previous end pointer to new pointer
             file_link.seekp(curr_link);file_link.seekg(curr_link);
 
             file_link.read((char*)&last,sizeof(way_link));
@@ -93,6 +115,8 @@ void link_last_way(way& child,vector <string > v){
 
 }
 
+vector<string> ve;
+
 void trie(string name, string id, string lev ,vector <string> v){
          ll curr_child=0, curr_root=0;
 
@@ -100,6 +124,7 @@ void trie(string name, string id, string lev ,vector <string> v){
             file.seekp(curr_root);file.seekg(curr_root);
             way root;
             file.read((char*)&root,sizeof(way));
+
 
             if(root.ptr[name[i]-0]==-1 ){
                 file.seekp(0,ios::end);file.seekg(0,ios::end);
@@ -113,11 +138,13 @@ void trie(string name, string id, string lev ,vector <string> v){
                     (lev).copy(child.admin_level, lev.length());
                     child.admin_level[lev.length()]='\0';
 
-                	link_last_way(child, v);
+                    link_last_way(child, v);
 
                 }
 
                 root.ptr[name[i]-0]=file.tellp();
+
+
                 curr_child=file.tellg();
                 file.write((char*)&child,sizeof(way));
 
@@ -140,9 +167,10 @@ void trie(string name, string id, string lev ,vector <string> v){
                     (lev).copy(child.admin_level, lev.length());
                     child.admin_level[lev.length()]='\0';
 
-                	link_last_way(child,v);
+                    link_last_way(child,v);
 
                 }
+
 
                 file.seekp(curr_child);file.seekg(curr_child);
                 file.write((char*)&child,sizeof(way));
@@ -158,7 +186,6 @@ void trie(string name, string id, string lev ,vector <string> v){
 string delimiter;
 string longitude, latitude;
 string id, name,lev;
-vector<string> ve;
 
 void read_file(string str){
         string::size_type sz = 0;
@@ -181,7 +208,7 @@ void read_file(string str){
             }
             else if(ii>=3){
                 ii++;
-                ve.push_back(token);
+                ve.push_back(token);              
             }
             str.erase(0, pos + delimiter.length());
         }
@@ -191,30 +218,30 @@ void read_file(string str){
 int main(){
 
     ll curr_child=0,curr_root=0,m=0;
-	string filename="trie.txt";
-	file.open("trie_way.txt",ios::trunc|ios::in|ios::out);
-	file_link.open("trie_link_way.txt",ios::trunc|ios::in|ios::out);
+	file.open("trie_way.txt",ios::trunc|ios::in|ios::binary|ios::out);
+	file_link.open("trie_link_way.txt",ios::trunc|ios::binary|ios::in|ios::out);
 
 	way root;
 	file.seekp(0);file.seekg(0);
     file.write((char*)&root,sizeof(way));
 
 //abcd 1 2.2 3.3 2
-    std::ifstream way_file("waysDataForTrie.txt");
+    std::ifstream way_file;
+    way_file.open("waysDataWithNodeLongLatNew.txt");
     delimiter = "$";
     string str;
-    while(!way_file.eof()) // To get you all the lines.
+    while(!way_file.eof() ) // To get you all the lines.
     {
         getline(way_file,str); // Saves the line in STRING.
         read_file(str);
-        cout<<name<<endl;
+        cout<<str<<endl;
+        //cout<<name<<"       ";
         trie(name, id, lev, ve);
+        
         ve.clear();
     }
 
-
-
-//    way_file.close();
+    way_file.close();
     file_link.close();
     file.close();
 
